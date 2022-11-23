@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+	"strings"
+)
 
 func main() {
 	conferenceName := "Go Conference"
@@ -8,9 +12,7 @@ func main() {
 	var remainingTickets uint = 50
 	var isRunning bool = true
 
-	fmt.Printf("Welcome to the %v booking application.\n", conferenceName)
-	fmt.Printf("We have a total of %v tickets and %v are still available.\n", conferenceTickets, remainingTickets)
-	fmt.Println("Get your tickets here!")
+	greetUser(conferenceName, conferenceTickets, remainingTickets)
 
 	var bookings []string
 
@@ -32,22 +34,79 @@ func main() {
 		fmt.Println("Please enter the number of tickets you want to order: ")
 		fmt.Scan(&userTickets)
 
+		isValidUserInput := validateUserInput(firstName, lastName, email, userTickets, remainingTickets)
+
+		if !isValidUserInput {
+			fmt.Println("Invalid User input.")
+			continue
+		}
+
 		remainingTickets -= uint(userTickets)
 		bookings = append(bookings, firstName+" "+lastName)
 
-		fmt.Printf("User %v %v has booked %v tickets.\n", firstName, lastName, userTickets)
-		fmt.Printf("Your tickets will be sent to your email address: %v\n", email)
-		fmt.Printf("We have a total of %v tickets and %v are still available.\n", conferenceTickets, remainingTickets)
-		fmt.Printf("Bookings: %v\nNumber of Bookings: %v\n", bookings, len(bookings))
+		//print successful booking
+		printBookingInfo(firstName, lastName, userTickets, email, conferenceTickets, remainingTickets)
 
-		var willContinue int
+		//printFirstNames
+		printFirstNames(bookings)
 
-		fmt.Print("Do you want to continue booking?\n1.Yes\n2.No\n")
-		fmt.Scan(&willContinue)
-
-		if willContinue == 2 {
-			isRunning = false
+		if remainingTickets == 0 {
+			fmt.Println("The conference is sold out.")
+			break
+		} else {
+			continue
 		}
 	}
+}
 
+func greetUser(confName string, confTickets int, remainTickets uint) {
+	fmt.Printf("Welcome to the %v booking system.\n", confName)
+	fmt.Printf("We have a total of %v tickets and %v are still available.\n", confTickets, remainTickets)
+	fmt.Println("Get your tickets here!")
+}
+
+func isNameValid(name string) bool {
+	return len(name) >= 2 && !regexp.MustCompile(`\d`).MatchString(name)
+}
+
+func printFirstNames(bookings []string) {
+	for index, booking := range bookings {
+		firstNameSplit := strings.Split(booking, " ")
+		fmt.Printf("%v. %v\n", index+1, firstNameSplit[0])
+	}
+}
+
+func printBookingInfo(firstName string, lastName string, userTickets int, email string, conferenceTickets int, remainingTickets uint) {
+	fmt.Printf("User %v %v has booked %v tickets.\n", firstName, lastName, userTickets)
+	fmt.Printf("Your tickets will be sent to your email address: %v\n", email)
+	fmt.Printf("We have a total of %v tickets and %v are still available.\n", conferenceTickets, remainingTickets)
+}
+
+func validateUserInput(firstName string, lastName string, email string, userTickets int, remainingTickets uint) bool {
+	firstNameIsValid := isNameValid(firstName)
+	lastNameIsValid := isNameValid(lastName)
+
+	if !firstNameIsValid || !lastNameIsValid {
+		fmt.Println("Please enter a valid Name!")
+	}
+
+	emailIsValid := len(email) > 5 && strings.Contains(email, "@") && strings.Contains(email, ".")
+
+	if !emailIsValid {
+		fmt.Println("Please enter a valid Email address!")
+
+	}
+
+	userTicketsIsValid := userTickets > 0 && userTickets <= int(remainingTickets)
+
+	if !userTicketsIsValid {
+		fmt.Println("Invalid amount of tickets!")
+
+	}
+
+	if userTickets > int(remainingTickets) {
+		fmt.Printf("We only have %v tickets left for sale. You can't buy %v tickets.\n", remainingTickets, userTickets)
+
+	}
+	return firstNameIsValid && lastNameIsValid && emailIsValid && userTicketsIsValid
 }
