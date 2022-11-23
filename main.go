@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 )
 
@@ -50,10 +49,6 @@ func greetUser() {
 	fmt.Println("Get your tickets here!")
 }
 
-func isNameValid(name string) bool {
-	return len(name) >= 2 && !regexp.MustCompile(`\d`).MatchString(name)
-}
-
 func printFirstNames() {
 	for index, booking := range bookings {
 		firstNameSplit := strings.Split(booking, " ")
@@ -94,27 +89,6 @@ func validateUserInput(firstName string, lastName string, email string, userTick
 
 	}
 	return firstNameIsValid && lastNameIsValid && emailIsValid && userTicketsIsValid
-}
-
-func getUserInput() (string, string, string, int) {
-	var firstName string
-	var lastName string
-	var email string
-	var userTickets int
-
-	fmt.Println("Please enter your first name: ")
-	fmt.Scan(&firstName)
-
-	fmt.Println("Please enter your last name: ")
-	fmt.Scan(&lastName)
-
-	fmt.Println("Please enter your email address: ")
-	fmt.Scan(&email)
-
-	fmt.Println("Please enter the number of tickets you want to order: ")
-	fmt.Scan(&userTickets)
-
-	return firstName, lastName, email, userTickets
 }
 
 func bookTickets(userTickets int, firstName string, lastName string) {
