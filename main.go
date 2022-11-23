@@ -17,22 +17,8 @@ func main() {
 	var bookings []string
 
 	for isRunning {
-		var firstName string
-		var lastName string
-		var email string
-		var userTickets int
 
-		fmt.Println("Please enter your first name: ")
-		fmt.Scan(&firstName)
-
-		fmt.Println("Please enter your last name: ")
-		fmt.Scan(&lastName)
-
-		fmt.Println("Please enter your email address: ")
-		fmt.Scan(&email)
-
-		fmt.Println("Please enter the number of tickets you want to order: ")
-		fmt.Scan(&userTickets)
+		firstName, lastName, email, userTickets := getUserInput()
 
 		isValidUserInput := validateUserInput(firstName, lastName, email, userTickets, remainingTickets)
 
@@ -41,8 +27,8 @@ func main() {
 			continue
 		}
 
-		remainingTickets -= uint(userTickets)
-		bookings = append(bookings, firstName+" "+lastName)
+		//book tickets
+		remainingTickets, bookings = bookTickets(remainingTickets, userTickets, bookings, firstName, lastName)
 
 		//print successful booking
 		printBookingInfo(firstName, lastName, userTickets, email, conferenceTickets, remainingTickets)
@@ -52,9 +38,7 @@ func main() {
 
 		if remainingTickets == 0 {
 			fmt.Println("The conference is sold out.")
-			break
-		} else {
-			continue
+			isRunning = false
 		}
 	}
 }
@@ -109,4 +93,31 @@ func validateUserInput(firstName string, lastName string, email string, userTick
 
 	}
 	return firstNameIsValid && lastNameIsValid && emailIsValid && userTicketsIsValid
+}
+
+func getUserInput() (string, string, string, int) {
+	var firstName string
+	var lastName string
+	var email string
+	var userTickets int
+
+	fmt.Println("Please enter your first name: ")
+	fmt.Scan(&firstName)
+
+	fmt.Println("Please enter your last name: ")
+	fmt.Scan(&lastName)
+
+	fmt.Println("Please enter your email address: ")
+	fmt.Scan(&email)
+
+	fmt.Println("Please enter the number of tickets you want to order: ")
+	fmt.Scan(&userTickets)
+
+	return firstName, lastName, email, userTickets
+}
+
+func bookTickets(remainingTickets uint, userTickets int, bookings []string, firstName string, lastName string) (uint, []string) {
+	remainingTickets -= uint(userTickets)
+	bookings = append(bookings, firstName+" "+lastName)
+	return remainingTickets, bookings
 }
