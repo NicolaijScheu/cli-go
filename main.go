@@ -6,12 +6,19 @@ import (
 	"strings"
 )
 
+type UserData struct {
+	firstName       string
+	lastName        string
+	email           string
+	numberOfTickets uint
+}
+
 const conferenceName = "Go Conference"
 const conferenceTickets = 50
 
 var remainingTickets uint = 50
 var isRunning bool = true
-var bookings []string
+var bookings = make([]UserData, 0)
 
 func main() {
 
@@ -29,7 +36,7 @@ func main() {
 		}
 
 		//book tickets
-		bookTickets(userTickets, firstName, lastName)
+		bookTickets(userTickets, firstName, lastName, email)
 
 		//print successful booking
 		printBookingInfo(firstName, lastName, userTickets, email)
@@ -51,9 +58,8 @@ func greetUser() {
 }
 
 func printFirstNames() {
-	for index, booking := range bookings {
-		firstNameSplit := strings.Split(booking, " ")
-		fmt.Printf("%v. %v\n", index+1, firstNameSplit[0])
+	for key, element := range bookings {
+		fmt.Printf("%v: %v, Email address: %v, Tickets: %v\n", key+1, element.firstName, element.email, element.numberOfTickets)
 	}
 }
 
@@ -92,7 +98,15 @@ func validateUserInput(firstName string, lastName string, email string, userTick
 	return firstNameIsValid && lastNameIsValid && emailIsValid && userTicketsIsValid
 }
 
-func bookTickets(userTickets int, firstName string, lastName string) {
+func bookTickets(userTickets int, firstName string, lastName string, email string) {
 	remainingTickets -= uint(userTickets)
-	bookings = append(bookings, firstName+" "+lastName)
+
+	var userData = UserData{
+		firstName:       firstName,
+		lastName:        lastName,
+		email:           email,
+		numberOfTickets: uint(userTickets),
+	}
+
+	bookings = append(bookings, userData)
 }
